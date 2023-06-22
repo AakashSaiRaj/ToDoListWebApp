@@ -5,6 +5,7 @@ const app=express();
 const bodyParser=require("body-parser");
 const PORT=process.env.PORT || 3000;
 var items=["Buy Food", "Cook Food", "Eat Food"];
+var work=[];
 app.use(bodyParser.urlencoded({extended:true}));
 
 app.use(express.static('public'));
@@ -16,18 +17,32 @@ app.get("/",  function(req, res){
         weekday:'long', day:"numeric", month:"long"
     };
     var day=today.toLocaleDateString("en-US", options);
-    res.render("list", {DAY:day, newListItems:items});
+    res.render("list", {listTitle:day, newListItems:items});
 });
 
 app.post("/", function(req, res){
     // console.log(req.body.newItem);
     var item=req.body.newItem;
-    items.push(item);
+    
+    if(req.body.button==="Work"){
+        work.push(item);
+        res.redirect("/work");
+    }else{
+        items.push(item);
+        res.redirect("/");
+    }
 
     // res.render("list", {newListItem:req.body.newItem});
-    res.redirect("/");
+    
 });
 
+app.get("/work", function(req, res){
+    res.render("list", {listTitle:"Work", newListItems:work});
+});
+
+app.get("/about", function(req, res){
+    res.render("about");
+});
 
 app.listen(PORT, function(){
     console.log(`App listening to ${PORT}`);
